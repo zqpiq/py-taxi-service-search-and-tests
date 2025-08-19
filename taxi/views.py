@@ -6,7 +6,14 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Driver, Car, Manufacturer
-from .forms import DriverCreationForm, DriverLicenseUpdateForm, CarForm
+from .forms import (
+    DriverCreationForm,
+    DriverLicenseUpdateForm,
+    CarForm,
+    DriverUsernameSearchField,
+    ManufacturerNameSearchField,
+    CarModelSearchField,
+)
 
 
 @login_required
@@ -36,6 +43,18 @@ class ManufacturerListView(LoginRequiredMixin, generic.ListView):
     template_name = "taxi/manufacturer_list.html"
     paginate_by = 5
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_form"] = ManufacturerNameSearchField()
+        return context
+
+    def get_queryset(self):
+        name = self.request.GET.get("name")
+        queryset = self.model.objects.all()
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
+
 
 class ManufacturerCreateView(LoginRequiredMixin, generic.CreateView):
     model = Manufacturer
@@ -58,6 +77,18 @@ class CarListView(LoginRequiredMixin, generic.ListView):
     model = Car
     paginate_by = 5
     queryset = Car.objects.select_related("manufacturer")
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_form"] = CarModelSearchField()
+        return context
+
+    def get_queryset(self):
+        model = self.request.GET.get("model")
+        queryset = self.model.objects.all()
+        if model:
+            queryset = queryset.filter(model__icontains=model)
+        return queryset
 
 
 class CarDetailView(LoginRequiredMixin, generic.DetailView):
@@ -84,6 +115,18 @@ class CarDeleteView(LoginRequiredMixin, generic.DeleteView):
 class DriverListView(LoginRequiredMixin, generic.ListView):
     model = Driver
     paginate_by = 5
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_form"] = DriverUsernameSearchField()
+        return context
+
+    def get_queryset(self):
+        username = self.request.GET.get("username")
+        queryset = self.model.objects.all()
+        if username:
+            queryset = queryset.filter(username__icontains=username)
+        return queryset
 
 
 class DriverDetailView(LoginRequiredMixin, generic.DetailView):
