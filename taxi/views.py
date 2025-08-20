@@ -85,7 +85,7 @@ class CarListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         model = self.request.GET.get("model")
-        queryset = self.model.objects.all()
+        queryset = super().get_queryset()
         if model:
             queryset = queryset.filter(model__icontains=model)
         return queryset
@@ -147,7 +147,7 @@ class DriverLicenseUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 class DriverDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Driver
-    success_url = reverse_lazy("")
+    success_url = reverse_lazy("taxi:driver-list")
 
 
 @login_required
