@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from taxi.models import Car, Manufacturer
+from taxi.models import Car, Manufacturer, Driver
 
 
 class CarListViewTests(TestCase):
@@ -42,17 +42,23 @@ class CarListViewTests(TestCase):
 
 class DriverListViewTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(
+        self.user = Driver.objects.create_user(
             username="testuser",
             password="testpass123",
-        )
-        self.driver1 = get_user_model().objects.create_user(
-            username="driver1", password="pass123"
-        )
-        self.driver2 = get_user_model().objects.create_user(
-            username="driver2", password="pass123"
+            license_number="ABC12345",
         )
         self.client.login(username="testuser", password="testpass123")
+
+        self.driver1 = Driver.objects.create_user(
+            username="driver1",
+            password="pass12345",
+            license_number="DRV00001",
+        )
+        self.driver2 = Driver.objects.create_user(
+            username="driver2",
+            password="pass12345",
+            license_number="DRV00002",
+        )
 
     def test_driver_list_view_returns_all_drivers(self):
         url = reverse("taxi:driver-list")
