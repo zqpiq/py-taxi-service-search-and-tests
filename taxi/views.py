@@ -18,7 +18,6 @@ from .forms import (
 
 @login_required
 def index(request):
-    """View function for the home page of the site."""
 
     num_drivers = Driver.objects.count()
     num_cars = Car.objects.count()
@@ -155,7 +154,7 @@ def toggle_assign_to_car(request, pk):
     driver = Driver.objects.get(id=request.user.id)
     if (
         Car.objects.get(id=pk) in driver.cars.all()
-    ):  # probably could check if car exists
+    ):
         driver.cars.remove(pk)
     else:
         driver.cars.add(pk)
